@@ -1,0 +1,162 @@
+---
+swagger: "2.0"
+info:
+  description: "Software Engineering candidates must implement and setup hosting of\
+    \ an API conforming to this API.\n"
+  version: "1.0"
+  title: "LX Group Technical Challenge - Andrew Varis"
+#host: ""
+host: "localhost:8080"
+basePath: "/api"
+schemes:
+- "http"
+produces:
+- "application/json"
+paths:
+  /reverse-words:
+    get:
+      summary: "Reverses the letters of each word in a sentence."
+      description: "Note: Punctuation such as full stops, exclamation marks, question\
+        \ marks, double quotes and commas should remain in postion. Apostrophes in\
+        \ the middle or end of a word should be reversed in the same way as other\
+        \ characters.\n\n**Example 1**\n\n  - Original: `LX's head office is located\
+        \ in Sydney, Australia.`\n  - Reversed: `s'XL daeh eciffo si detacol ni yendyS,\
+        \ ailartsuA.`\n\n**Example 2**\n\n  - Original: `Is the sentence \"Hello World!\"\
+        \ often used in programming examples?`\n  - Reversed: `sI eht ecnetnes \"\
+        olleH dlroW!\" netfo desu ni gnimmargorp selpmaxe?`\n"
+      operationId: "reverse_wordsGET"
+      parameters:
+      - name: "sentence"
+        in: "query"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "The sentence was successfully processed."
+          schema:
+            type: "string"
+      x-swagger-router-controller: "Default"
+  /sort-words:
+    get:
+      summary: "Sorts the letters of each word in a sentence."
+      description: "Note: Punctuation such as full stops, exclamation marks, question\
+        \ marks, double quotes and commas should remain in postion. Apostrophes should\
+        \ be reversed in the same way as other characters.\n\n**Example 1**\n\n- Original:\
+        \ `LX's head office is located in Sydney, Australia.`\n- Reversed: `'LsX adeh\
+        \ ceffio is acdelot in denSyy, Aaailrstu.`\n\n'\n\n**Example 2**\n\n- Original:\
+        \ `Is the sentence \"Hello World!\" is often used in programming examples?`\n\
+        - Reversed: `Is eht ceeennst \"eHllo dlorW!\" is efnot desu in aggimmnoprr\
+        \ aeelmpsx?`\n"
+      operationId: "sort_wordsGET"
+      parameters:
+      - name: "sentence"
+        in: "query"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "The sentence was successfully processed."
+          schema:
+            type: "string"
+      x-swagger-router-controller: "Default"
+  /calculate-after-tax-income:
+    get:
+      summary: "Calculates the annual take home pay for a given salary in Australia."
+      description: "For the purposes of this test use the following tax brackets:\
+        \ \n\nTaxable Income     | Rate\n------------------- | -------------\n$0 -\
+        \ $18,200        | 0%\n$18,201 - $37,000   | 19%\n$37,001 - $87,000   | 32.5%\n\
+        $87,001 - $180,000  | 37%\nOver $180,000       | 45%\n\nThe Australian tax\
+        \ rules specify that only whole dollars be taxed, e.g. `$87,000.50` is taxed\
+        \ as `$87,000.00`.\n\nIn addition to basic income tax please also apply the\
+        \ medicare levy using the rules.\n\nTaxable Income     | Rate\n-------------------\
+        \ | -------------\nUp to $21,336       | 0%\n$21,336 to $26,668  | 10% of\
+        \ amount over $21,336\nOver $26,668        | 2%\n\nThe medicare levey surcharge\
+        \ can be ignored as the rules for whether or not it applies are beyond the\
+        \ scope of this excersise.\n\nSuperannuation should be calculated as `9.5%`\
+        \ on top of the base salary and rounded to the nearest cent.\n\n#### Rounding\n\
+        \n- The ATO have a crazy rule where values above `0.159` are rounded up.\n\
+        - Medicare levy is rounded to the nearest cent.\n- Total taxes are the sum\
+        \ of income tax and medicare rounded to the nearest whole dollar.\n"
+      operationId: "calculate_after_tax_incomeGET"
+      parameters:
+      - name: "annualBaseSalary"
+        in: "query"
+        description: "The base salary in AUD"
+        required: true
+        type: "number"
+        format: "double"
+      responses:
+        200:
+          description: "Take home pay calculation completed successfully."
+          schema:
+            $ref: "#/definitions/CalculatedPay"
+          examples:
+            baseSalary: 85000
+            superannuation: 8075
+            taxes:
+              income: 19172
+              medicare: 1700
+              total: 20872
+            postTaxIncome: 64128
+      x-swagger-router-controller: "Default"
+  /calculate-pre-tax-income-from-take-home:
+    get:
+      summary: "Calculates pre tax annual salary required for a desired take home\
+        \ pay."
+      description: "\n> **This API is optional, you may do it if your still under\
+        \ three hours or if you just enjoy the challenge.**\n\nThe tax calculation\
+        \ rules are the same as the `/api/calculate-after-tax-income` API, please\
+        \ refer to that description for details.\n"
+      operationId: "calculate_pre_tax_income_from_take_homeGET"
+      parameters:
+      - name: "postTaxSalary"
+        in: "query"
+        description: "The desired after tax income in AUD"
+        required: true
+        type: "number"
+        format: "double"
+      responses:
+        200:
+          description: "Take home pay calculation completed successfully."
+          schema:
+            $ref: "#/definitions/CalculatedPay"
+          examples:
+            baseSalary: 84804
+            superannuation: 8056.3800000000001091393642127513885498046875
+            taxes:
+              income: 19108
+              medicare: 1696.079999999999927240423858165740966796875
+              total: 20804
+            postTaxIncome: 64000
+      x-swagger-router-controller: "Default"
+definitions:
+  TaxBreakdown:
+    type: "object"
+    properties:
+      income:
+        type: "number"
+        format: "double"
+      medicare:
+        type: "number"
+        format: "double"
+      total:
+        type: "number"
+        format: "double"
+    description: "The breakdown (TaxBreakdown object) of the payable taxes"
+  CalculatedPay:
+    type: "object"
+    properties:
+      baseSalary:
+        type: "number"
+        format: "double"
+        description: "The pre-tax annual salary (excluding superannuation)"
+      superannuation:
+        type: "number"
+        format: "double"
+        description: "The amount of superannuation payable annually on the base salary"
+      taxes:
+        $ref: "#/definitions/TaxBreakdown"
+      postTaxIncome:
+        type: "number"
+        format: "double"
+        description: "The income taken home after all taxes are paid."
