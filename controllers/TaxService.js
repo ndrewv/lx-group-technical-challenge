@@ -1,7 +1,7 @@
 'use strict';
 
 const util = require('util');
-var debug = true;
+var debug = false;
 
 exports.calculate_after_tax_incomeGET = function(args, res, next) {
   /**
